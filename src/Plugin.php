@@ -32,8 +32,6 @@ final class Plugin {
 		}
 		$this->booted = true;
 
-		add_action( 'init', array( $this, 'load_textdomain' ), 1 );
-
 		( new PostType() )->register();
 		( new Admin\ListPage() )->register();
 		( new Admin\BuilderPage() )->register();
@@ -43,13 +41,5 @@ final class Plugin {
 		( new Frontend\PreviewRoute() )->register();
 		( new Blocks\SliderBlock() )->register();
 		( new Elementor\WidgetManager() )->register();
-	}
-
-	public function load_textdomain(): void {
-		load_plugin_textdomain(
-			'boldslider',
-			false,
-			dirname( BOLDSLIDER_BASENAME ) . '/languages'
-		);
 	}
 }

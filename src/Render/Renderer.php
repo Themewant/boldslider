@@ -392,10 +392,14 @@ final class Renderer {
 			$close_link = '</a>';
 		}
 
+		// $open_link is built entirely from esc_url() + esc_attr() above; $close_link is the
+		// literal string '</a>'. PHPCS cannot statically verify pre-escaped HTML fragments,
+		// so we suppress the sniff on every echo of these two variables.
+		// $tag is validated against an explicit allowlist (h1-h6, p, span, div) above.
 		switch ( $type ) {
 			case 'image':
 				$image_id = (int) ( $layer['content']['image_id'] ?? 0 );
-				echo $open_link;
+				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				if ( $image_id > 0 ) {
 					echo wp_get_attachment_image(
 						$image_id,
@@ -407,7 +411,7 @@ final class Renderer {
 						)
 					);
 				}
-				echo $close_link;
+				echo $close_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			case 'button':
@@ -416,7 +420,7 @@ final class Renderer {
 				$icon_pos = (string) ( $layer['content']['icon_position'] ?? 'right' );
 				$svg      = 'none' !== $icon_id ? Icons::svg( $icon_id ) : '';
 
-				echo $open_link;
+				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo '<span class="boldslider-btn-inner">';
 				if ( $svg && 'left' === $icon_pos ) {
 					echo '<span class="boldslider-btn-icon">' . $svg . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -426,7 +430,7 @@ final class Renderer {
 					echo '<span class="boldslider-btn-icon">' . $svg . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 				echo '</span>';
-				echo $close_link;
+				echo $close_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			case 'shape':
@@ -438,11 +442,11 @@ final class Renderer {
 				if ( ! in_array( $tag, array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div' ), true ) ) {
 					$tag = 'h2';
 				}
-				echo $open_link;
-				echo '<' . $tag . ' class="boldslider-heading">';
+				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<' . $tag . ' class="boldslider-heading">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo wp_kses_post( (string) ( $layer['content']['text'] ?? '' ) );
-				echo '</' . $tag . '>';
-				echo $close_link;
+				echo '</' . $tag . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo $close_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 
 			case 'youtube':
@@ -473,9 +477,9 @@ final class Renderer {
 
 			case 'text':
 			default:
-				echo $open_link;
+				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo wp_kses_post( (string) ( $layer['content']['text'] ?? '' ) );
-				echo $close_link;
+				echo $close_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				break;
 		}
 	}

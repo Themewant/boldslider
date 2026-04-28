@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// Variables are passed in via include from Renderer::render() — not true globals.
 /**
  * Frontend slider template.
  *

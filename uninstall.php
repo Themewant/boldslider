@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// Variables in uninstall.php are file-scoped, not true globals — prefix rule doesn't apply here.
 /**
  * Fired when the plugin is deleted (not just deactivated).
  *

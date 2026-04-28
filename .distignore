@@ -1,0 +1,17 @@
+# Dev tools and source files — excluded from the WordPress.org SVN submission.
+# The compiled output in assets/dist/ IS included (it must be committed to SVN).
+
+.distignore
+.gitignore
+.git
+.DS_Store
+.claude
+node_modules
+package.json
+package-lock.json
+composer.json
+composer.lock
+webpack.config.js
+editor/
+blocks/
+*.log

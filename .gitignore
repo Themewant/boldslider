@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Lock files (regeneratable)
+package-lock.json
+composer.lock
+
+# Build source (compiled output in assets/dist/ is committed instead)
+editor/
+blocks/
+
+# Config files not needed in distribution
+package.json
+webpack.config.js
+composer.json
+
+# Claude AI workspace
+.claude/
+
+# System files
+.DS_Store
+*.log

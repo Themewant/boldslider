@@ -6,8 +6,9 @@ package-lock.json
 composer.lock
 
 # Build source (compiled output in assets/dist/ is committed instead)
-editor/
-blocks/
+# Leading / anchors to repo root — prevents matching src/Blocks/ or src/Editor/ on case-insensitive macOS
+/editor/
+/blocks/
 
 # Config files not needed in distribution
 package.json

@@ -110,12 +110,15 @@ final class BuilderPage {
 		return '
 			/* Hide WP admin chrome immediately — must beat any later admin stylesheet. */
 			#wpadminbar, #adminmenumain, #adminmenuback, #adminmenu { display: none !important; }
-			/* Hide all admin notices and messages. */
-			#wpbody-content > .notice, #wpbody-content > .update-nag, #wpbody-content > div[class*="notice"] { display: none !important; }
+			/* Hide all admin notices and messages — multiple selectors to catch all variations. */
+			.notice, .update-nag, .error, .success, .warning, .info,
+			#wpbody-content > div[class*="notice"],
+			#wpbody-content > .notice-info,
+			.wp-pointer { display: none !important; }
 			/* Force the dark builder background from the very first paint. */
-			html, body { padding-top: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; }
+			html, body { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
 			body.wp-admin { background: #13161a !important; }
-			#wpcontent, #wpbody, #wpbody-content { margin-left: 0 !important; padding-top: 0 !important; float: none; background: #13161a !important; }
+			#wpcontent, #wpbody, #wpbody-content { margin-left: 0 !important; padding: 0 !important; float: none; background: #13161a !important; height: 100vh !important; overflow: hidden !important; }
 			.wrap { margin: 0 !important; padding: 0 !important; }
 			#' . self::ROOT_ID . ' { position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: #13161a; }
 			.bs-loading-shell { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #13161a; color: #b0b6bf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }

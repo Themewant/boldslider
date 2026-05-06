@@ -22,6 +22,7 @@ final class BuilderPage {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_action( 'admin_head', array( $this, 'set_page_title' ) );
 	}
 
 	public function add_page(): void {
@@ -34,6 +35,17 @@ final class BuilderPage {
 			self::MENU_SLUG,
 			array( $this, 'render' )
 		);
+	}
+
+	public function set_page_title(): void {
+		// WP generates the hook as 'admin_page_<slug>' for blank-parent submenus.
+		global $hook_suffix;
+		if ( 'admin_page_' . self::MENU_SLUG !== $hook_suffix ) {
+			return;
+		}
+		// Set the global $title so admin-header.php doesn't pass null to strip_tags().
+		global $title;
+		$title = __( 'Slider Builder — BoldSlider', 'boldslider' );
 	}
 
 	public function enqueue( string $hook_suffix ): void {

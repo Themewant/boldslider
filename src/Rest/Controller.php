@@ -216,7 +216,7 @@ final class Controller {
 	public function get_item( \WP_REST_Request $request ): \WP_REST_Response {
 		$id    = (int) $request->get_param( 'id' );
 		$post  = get_post( $id );
-		$title = $post instanceof \WP_Post ? $post->post_title : '';
+		$title = ( $post instanceof \WP_Post && $post->post_title ) ? (string) $post->post_title : '';
 		$data  = SliderRepository::get( $id );
 		$data  = $this->resolve_image_urls( $data );
 
@@ -418,7 +418,7 @@ final class Controller {
 
 		return array(
 			'id'            => $post->ID,
-			'title'         => $post->post_title,
+			'title'         => $post->post_title ? (string) $post->post_title : '',
 			'slide_count'   => $slide_count,
 			'thumbnail_url' => $thumbnail_url,
 			'shortcode'     => \BoldSlider\Admin\BuilderPage::build_shortcode( (int) $post->ID ),

@@ -54,6 +54,11 @@ final class BuilderPage {
 			return;
 		}
 
+		// Remove all notice hooks so nothing renders above our React root.
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+
 		ListPage::enqueue_bundle();
 		wp_enqueue_media();
 		// NOTE: Google Fonts are intentionally NOT loaded from the Google CDN here.
@@ -110,15 +115,22 @@ final class BuilderPage {
 		return '
 			/* Hide WP admin chrome immediately — must beat any later admin stylesheet. */
 			#wpadminbar, #adminmenumain, #adminmenuback, #adminmenu { display: none !important; }
-			/* Hide all admin notices and messages — multiple selectors to catch all variations. */
+			/* Hide all admin notices and messages — catch TGM and all other notice types. */
+			div[class*="notice"], div[class*="message"], div[class*="updated"],
 			.notice, .update-nag, .error, .success, .warning, .info,
+			.tgmpa, .tgm-plugin-notice,
+			#wpbody-content > .notice, #wpbody-content > .update-nag,
 			#wpbody-content > div[class*="notice"],
-			#wpbody-content > .notice-info,
-			.wp-pointer { display: none !important; }
+			#wpbody-content > div[class*="message"],
+			#wpbody-content > div[class*="updated"],
+			.wp-pointer,
+			#setting-error-settings_updated,
+			.settings-error { display: none !important; visibility: hidden !important; }
 			/* Force the dark builder background from the very first paint. */
-			html, body { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
+			html { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
+			body { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
 			body.wp-admin { background: #13161a !important; }
-			#wpcontent, #wpbody, #wpbody-content { margin-left: 0 !important; padding: 0 !important; float: none; background: #13161a !important; height: 100vh !important; overflow: hidden !important; }
+			#wpcontent, #wpbody, #wpbody-content { margin: 0 !important; padding: 0 !important; float: none; background: #13161a !important; height: 100vh !important; overflow: hidden !important; }
 			.wrap { margin: 0 !important; padding: 0 !important; }
 			#' . self::ROOT_ID . ' { position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: #13161a; }
 			.bs-loading-shell { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #13161a; color: #b0b6bf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }

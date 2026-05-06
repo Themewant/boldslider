@@ -110,8 +110,10 @@ final class BuilderPage {
 		return '
 			/* Hide WP admin chrome immediately — must beat any later admin stylesheet. */
 			#wpadminbar, #adminmenumain, #adminmenuback, #adminmenu { display: none !important; }
+			/* Hide all admin notices and messages. */
+			#wpbody-content > .notice, #wpbody-content > .update-nag, #wpbody-content > div[class*="notice"] { display: none !important; }
 			/* Force the dark builder background from the very first paint. */
-			html, body { padding-top: 0 !important; margin: 0 !important; background: #13161a !important; }
+			html, body { padding-top: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; }
 			body.wp-admin { background: #13161a !important; }
 			#wpcontent, #wpbody, #wpbody-content { margin-left: 0 !important; padding-top: 0 !important; float: none; background: #13161a !important; }
 			.wrap { margin: 0 !important; padding: 0 !important; }

@@ -36,6 +36,7 @@ final class Plugin {
 		( new Admin\ListPage() )->register();
 		( new Admin\BuilderPage() )->register();
 		( new Rest\Controller() )->register();
+		( new Frontend\StyleInjector() )->register();
 		( new Frontend\AssetsFrontend() )->register();
 		( new Frontend\Shortcode() )->register();
 		( new Frontend\PreviewRoute() )->register();

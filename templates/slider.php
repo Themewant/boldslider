@@ -213,10 +213,10 @@ $wrap_style = $is_fullscreen
 
 	<?php
 	$responsive_css = \BoldSlider\Render\Renderer::build_responsive_css( $slides, $canvas_w, $canvas_h, (int) $slider_id, $settings );
-	if ( '' !== $responsive_css ) :
+	if ( '' !== $responsive_css ) {
+		\BoldSlider\Frontend\StyleInjector::queue_style( 'responsive-' . (int) $slider_id, $responsive_css );
+	}
 	?>
-	<style class="boldslider-responsive-css"><?php echo $responsive_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></style>
-	<?php endif; ?>
 
 	<?php
 	/**

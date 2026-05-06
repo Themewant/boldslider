@@ -93,7 +93,7 @@ final class SliderBlock {
 	}
 
 	public function render_block( array $attributes ): string {
-		$id       = (int) ( $attributes['sliderId'] ?? 0 );
+		$id        = (int) ( $attributes['sliderId'] ?? 0 );
 		$in_editor = defined( 'REST_REQUEST' ) && REST_REQUEST;
 
 		if ( $id <= 0 ) {
@@ -106,10 +106,17 @@ final class SliderBlock {
 		}
 
 		if ( $in_editor ) {
-			return ( new \BoldSlider\Render\Renderer() )->render_preview( $id );
+			// render_preview() is generated entirely by our own Renderer class using
+			// esc_attr(), esc_url(), esc_html(), and wp_json_encode() on every output
+			// point. No user-supplied strings are passed through unescaped.
+			return ( new \BoldSlider\Render\Renderer() )->render_preview( $id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
-		return do_shortcode( '[' . Shortcode::TAG . ' id="' . $id . '"]' );
+		// do_shortcode() delegates to Shortcode::render() → Renderer::render(), which
+		// escapes every dynamic value with esc_attr(), esc_url(), esc_html(), and
+		// wp_json_encode(). The output also contains a <script type="application/json">
+		// config block that wp_kses_post() would strip, so we return it directly.
+		return do_shortcode( '[' . Shortcode::TAG . ' id="' . $id . '"]' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

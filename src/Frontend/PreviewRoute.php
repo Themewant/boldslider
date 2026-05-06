@@ -48,6 +48,12 @@ final class PreviewRoute {
 		nocache_headers();
 		AssetsFrontend::ensure_enqueued();
 
+		// Enqueue preview bar CSS.
+		$preview_bar_css = $this->get_preview_bar_css();
+		if ( '' !== $preview_bar_css ) {
+			\BoldSlider\Frontend\StyleInjector::queue_style( 'preview-bar', $preview_bar_css );
+		}
+
 		$html = do_shortcode( '[boldslider id="' . $id . '"]' );
 		?>
 <!DOCTYPE html>
@@ -57,17 +63,6 @@ final class PreviewRoute {
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title><?php echo esc_html( sprintf( /* translators: %s: slider title */ __( 'Preview — %s', 'boldslider' ), $post->post_title ) ); ?></title>
 	<?php wp_head(); ?>
-	<style>
-		html, body { margin: 0; padding: 0; background: #0f1114; color: #f0f0f1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-		.bs-preview-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 99999; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: rgba( 28, 32, 38, 0.95 ); backdrop-filter: blur( 8px ); border-bottom: 1px solid #2d3136; font-size: 13px; }
-		.bs-preview-bar__title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
-		.bs-preview-bar__title .dot { width: 8px; height: 8px; border-radius: 50%; background: #46b450; }
-		.bs-preview-bar__actions { display: flex; gap: 10px; }
-		.bs-preview-bar a, .bs-preview-bar button { color: #c8d2dd; text-decoration: none; background: transparent; border: 1px solid #2d3136; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
-		.bs-preview-bar a:hover, .bs-preview-bar button:hover { color: #fff; border-color: #4a5566; }
-		.bs-preview-stage { padding-top: 56px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding-left: 20px; padding-right: 20px; padding-bottom: 40px; }
-		.bs-preview-stage > * { width: 100%; max-width: 1400px; }
-	</style>
 </head>
 <body>
 	<div class="bs-preview-bar">
@@ -88,5 +83,19 @@ final class PreviewRoute {
 </html>
 		<?php
 		exit;
+	}
+
+	private function get_preview_bar_css(): string {
+		return '
+			html, body { margin: 0; padding: 0; background: #0f1114; color: #f0f0f1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+			.bs-preview-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 99999; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: rgba(28, 32, 38, 0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #2d3136; font-size: 13px; }
+			.bs-preview-bar__title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+			.bs-preview-bar__title .dot { width: 8px; height: 8px; border-radius: 50%; background: #46b450; }
+			.bs-preview-bar__actions { display: flex; gap: 10px; }
+			.bs-preview-bar a, .bs-preview-bar button { color: #c8d2dd; text-decoration: none; background: transparent; border: 1px solid #2d3136; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+			.bs-preview-bar a:hover, .bs-preview-bar button:hover { color: #fff; border-color: #4a5566; }
+			.bs-preview-stage { padding-top: 56px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding-left: 20px; padding-right: 20px; padding-bottom: 40px; }
+			.bs-preview-stage > * { width: 100%; max-width: 1400px; }
+		';
 	}
 }

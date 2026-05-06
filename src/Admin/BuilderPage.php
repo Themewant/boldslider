@@ -22,7 +22,6 @@ final class BuilderPage {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_action( 'admin_head', array( $this, 'fullscreen_css' ) );
 	}
 
 	public function add_page(): void {
@@ -51,6 +50,12 @@ final class BuilderPage {
 		// Google Fonts compliantly. The font picker in the builder still lists
 		// Google font names — they fall back to the user's theme stack in the free
 		// version unless the theme already loads them.
+
+		// Enqueue fullscreen builder CSS.
+		$fullscreen_css = $this->get_fullscreen_css();
+		if ( '' !== $fullscreen_css ) {
+			\BoldSlider\Frontend\StyleInjector::queue_style( 'builder-fullscreen', $fullscreen_css, 'boldslider-editor' );
+		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page id; the page itself is capability-gated by add_submenu_page().
 		$post_id = isset( $_GET['id'] ) ? absint( wp_unslash( $_GET['id'] ) ) : 0;
@@ -89,79 +94,21 @@ final class BuilderPage {
 		<?php
 	}
 
-	public function fullscreen_css(): void {
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( ! $screen || 'admin_page_' . self::MENU_SLUG !== $screen->id ) {
-			return;
-		}
-		?>
-		<style id="boldslider-fullscreen">
+	private function get_fullscreen_css(): string {
+		return '
 			/* Hide WP admin chrome immediately — must beat any later admin stylesheet. */
-			#wpadminbar,
-			#adminmenumain,
-			#adminmenuback,
-			#adminmenu { display: none !important; }
-
-			/* Force the dark builder background from the very first paint so there's
-			   no flash of light WP-admin grey before React mounts. */
-			html,
-			body {
-				padding-top: 0 !important;
-				margin: 0 !important;
-				background: #13161a !important;
-			}
+			#wpadminbar, #adminmenumain, #adminmenuback, #adminmenu { display: none !important; }
+			/* Force the dark builder background from the very first paint. */
+			html, body { padding-top: 0 !important; margin: 0 !important; background: #13161a !important; }
 			body.wp-admin { background: #13161a !important; }
-
-			#wpcontent,
-			#wpbody,
-			#wpbody-content {
-				margin-left: 0 !important;
-				padding-top: 0 !important;
-				float: none;
-				background: #13161a !important;
-			}
-
+			#wpcontent, #wpbody, #wpbody-content { margin-left: 0 !important; padding-top: 0 !important; float: none; background: #13161a !important; }
 			.wrap { margin: 0 !important; padding: 0 !important; }
-
-			#<?php echo esc_attr( self::ROOT_ID ); ?> {
-				position: fixed;
-				inset: 0;
-				z-index: 9999;
-				overflow: hidden;
-				background: #13161a;
-			}
-
-			/* ── Server-rendered loading shell (replaced by React on mount) ── */
-			.bs-loading-shell {
-				position: absolute;
-				inset: 0;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				gap: 14px;
-				background: #13161a;
-				color: #b0b6bf;
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-			}
-			.bs-loading-shell__spinner {
-				width: 36px;
-				height: 36px;
-				border: 3px solid #2d3136;
-				border-top-color: #2271b1;
-				border-radius: 50%;
-				animation: bs-loading-spin 0.7s linear infinite;
-			}
-			.bs-loading-shell__text {
-				font-size: 13px;
-				font-weight: 500;
-				letter-spacing: .01em;
-			}
-			@keyframes bs-loading-spin {
-				to { transform: rotate( 360deg ); }
-			}
-		</style>
-		<?php
+			#' . self::ROOT_ID . ' { position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: #13161a; }
+			.bs-loading-shell { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #13161a; color: #b0b6bf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+			.bs-loading-shell__spinner { width: 36px; height: 36px; border: 3px solid #2d3136; border-top-color: #2271b1; border-radius: 50%; animation: bs-loading-spin 0.7s linear infinite; }
+			.bs-loading-shell__text { font-size: 13px; font-weight: 500; letter-spacing: .01em; }
+			@keyframes bs-loading-spin { to { transform: rotate( 360deg ); } }
+		';
 	}
 
 	/**

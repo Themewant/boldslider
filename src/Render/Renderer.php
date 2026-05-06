@@ -115,33 +115,24 @@ final class Renderer {
 		// Scoped CSS for nav colors, layer responsive overrides, etc.
 		$responsive_css = self::build_responsive_css( array( $slide ), $canvas_w, $canvas_h, $slider_id, $settings );
 
+		// Queue preview CSS via StyleInjector for proper enqueuing.
+		$preview_css = sprintf(
+			'#%s.boldslider-preview > .boldslider-preview-inner { position: absolute; inset: 0; overflow: hidden; } ' .
+			'#%s.boldslider-preview > .boldslider-preview-inner > .boldslider-slide { position: absolute; inset: 0; width: 100%%; height: 100%%; } ' .
+			'#%s.boldslider-preview .boldslider-layer { --bs-opacity: 1; --bs-tx: 0px; --bs-ty: 0px; --bs-scale: 1; }',
+			$dom_id,
+			$dom_id,
+			$dom_id
+		);
+		\BoldSlider\Frontend\StyleInjector::queue_style( 'preview-' . $slider_id, $preview_css );
+
+		if ( '' !== $responsive_css ) {
+			\BoldSlider\Frontend\StyleInjector::queue_style( 'responsive-' . $slider_id, $responsive_css );
+		}
+
 		ob_start();
 		?>
 		<div class="<?php echo esc_attr( implode( ' ', $wrap_classes ) ); ?>" id="<?php echo esc_attr( $dom_id ); ?>" style="<?php echo esc_attr( $wrap_style ); ?>">
-
-			<?php // Inline CSS: make the Swiper-less inner container fill the wrap, and force layers
-			// into their visible "in" state since no JS runs to add .bs-anim-in.
-			// esc_html() is the correct escaper for content inside <style> tags. ?>
-			<style>
-			#<?php echo esc_html( $dom_id ); ?>.boldslider-preview > .boldslider-preview-inner {
-				position: absolute;
-				inset: 0;
-				overflow: hidden;
-			}
-			#<?php echo esc_html( $dom_id ); ?>.boldslider-preview > .boldslider-preview-inner > .boldslider-slide {
-				position: absolute;
-				inset: 0;
-				width: 100%;
-				height: 100%;
-			}
-			#<?php echo esc_html( $dom_id ); ?>.boldslider-preview .boldslider-layer {
-				--bs-opacity: 1;
-				--bs-tx: 0px;
-				--bs-ty: 0px;
-				--bs-scale: 1;
-			}
-			</style>
-
 			<div class="boldslider-preview-inner">
 				<div class="boldslider-slide"<?php echo $slide_inline ? ' style="' . esc_attr( $slide_inline ) . '"' : ''; ?>>
 
@@ -169,11 +160,6 @@ final class Renderer {
 				<button type="button" class="swiper-button-prev" style="pointer-events:none;" aria-hidden="true"></button>
 				<button type="button" class="swiper-button-next" style="pointer-events:none;" aria-hidden="true"></button>
 			<?php endif; ?>
-
-			<?php if ( '' !== $responsive_css ) : ?>
-				<style class="boldslider-responsive-css"><?php echo $responsive_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></style>
-			<?php endif; ?>
-
 		</div>
 		<?php
 		return (string) ob_get_clean();
@@ -418,15 +404,18 @@ final class Renderer {
 				$btn_text = (string) ( $layer['content']['text'] ?? '' );
 				$icon_id  = (string) ( $layer['content']['icon'] ?? 'none' );
 				$icon_pos = (string) ( $layer['content']['icon_position'] ?? 'right' );
+				// Icons::svg() returns one of 12 hardcoded SVG strings or empty string — not user input.
 				$svg      = 'none' !== $icon_id ? Icons::svg( $icon_id ) : '';
 
 				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo '<span class="boldslider-btn-inner">';
 				if ( $svg && 'left' === $icon_pos ) {
+					// $svg is a hardcoded icon from Icons::svg() — safe to output directly.
 					echo '<span class="boldslider-btn-icon">' . $svg . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 				echo '<span>' . esc_html( $btn_text ) . '</span>';
 				if ( $svg && 'right' === $icon_pos ) {
+					// $svg is a hardcoded icon from Icons::svg() — safe to output directly.
 					echo '<span class="boldslider-btn-icon">' . $svg . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 				echo '</span>';
@@ -439,10 +428,12 @@ final class Renderer {
 
 			case 'heading':
 				$tag = (string) ( $layer['content']['tag'] ?? 'h2' );
+				// Validate against explicit allowlist — $tag is safe to output after this check.
 				if ( ! in_array( $tag, array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div' ), true ) ) {
 					$tag = 'h2';
 				}
 				echo $open_link; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				// $tag is validated against an explicit allowlist above, so it's safe to output directly.
 				echo '<' . $tag . ' class="boldslider-heading">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo wp_kses_post( (string) ( $layer['content']['text'] ?? '' ) );
 				echo '</' . $tag . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace BoldSlider\Rest;
 
+use BoldSlider\Library\LibraryData;
 use BoldSlider\Models\Schema;
 use BoldSlider\Models\SliderRepository;
 use BoldSlider\PostType;
@@ -37,7 +38,7 @@ final class Controller {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'can_list' ),
+					'permission_callback' => array( $this, 'can_create' ),
 				),
 			)
 		);
@@ -59,6 +60,26 @@ final class Controller {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'import_item' ),
+				'permission_callback' => array( $this, 'can_create' ),
+			)
+		);
+
+		// Library: templates + slides.
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/library/templates',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'library_templates' ),
+				'permission_callback' => array( $this, 'can_list' ),
+			)
+		);
+		register_rest_route(
+			self::NAMESPACE_V1,
+			'/library/slides',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'library_slides' ),
 				'permission_callback' => array( $this, 'can_list' ),
 			)
 		);
@@ -83,7 +104,7 @@ final class Controller {
 				array(
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'can_edit_item' ),
+					'permission_callback' => array( $this, 'can_delete_item' ),
 					'args'                => array( 'id' => array( 'type' => 'integer', 'required' => true ) ),
 				),
 			)
@@ -93,7 +114,14 @@ final class Controller {
 	// ---- Permission callbacks -----------------------------------------------
 
 	public function can_list(): bool {
-		return current_user_can( 'edit_posts' );
+		// edit_others_posts is required because the list endpoint returns all sliders,
+		// including drafts authored by other users.
+		return current_user_can( 'edit_others_posts' );
+	}
+
+	public function can_create(): bool {
+		// Creating a new slider post requires publish_posts capability.
+		return current_user_can( 'publish_posts' );
 	}
 
 	public function can_edit_item( \WP_REST_Request $request ) {
@@ -107,6 +135,21 @@ final class Controller {
 		}
 		if ( ! current_user_can( 'edit_post', $id ) ) {
 			return new \WP_Error( 'boldslider_forbidden', __( 'You cannot edit this slider.', 'boldslider' ), array( 'status' => 403 ) );
+		}
+		return true;
+	}
+
+	public function can_delete_item( \WP_REST_Request $request ) {
+		$id = (int) $request->get_param( 'id' );
+		if ( $id <= 0 ) {
+			return new \WP_Error( 'boldslider_invalid_id', __( 'Invalid slider id.', 'boldslider' ), array( 'status' => 400 ) );
+		}
+		$post = get_post( $id );
+		if ( ! $post instanceof \WP_Post || PostType::SLUG !== $post->post_type ) {
+			return new \WP_Error( 'boldslider_not_found', __( 'Slider not found.', 'boldslider' ), array( 'status' => 404 ) );
+		}
+		if ( ! current_user_can( 'delete_post', $id ) ) {
+			return new \WP_Error( 'boldslider_forbidden', __( 'You cannot delete this slider.', 'boldslider' ), array( 'status' => 403 ) );
 		}
 		return true;
 	}
@@ -346,6 +389,16 @@ final class Controller {
 		}
 		$data['slides'] = $slides;
 		return $data;
+	}
+
+	// ---- Library endpoints -------------------------------------------------
+
+	public function library_templates(): \WP_REST_Response {
+		return new \WP_REST_Response( LibraryData::get_templates(), 200 );
+	}
+
+	public function library_slides(): \WP_REST_Response {
+		return new \WP_REST_Response( LibraryData::get_slides(), 200 );
 	}
 
 	private function format_list_item( \WP_Post $post ): array {

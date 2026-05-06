@@ -22,7 +22,6 @@ final class ListPage {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_action( 'admin_head', array( $this, 'clean_page_chrome' ) );
 	}
 
 	public function add_menu(): void {
@@ -44,6 +43,17 @@ final class ListPage {
 
 		$this->enqueue_bundle();
 
+		// Enqueue list page chrome CSS.
+		$chrome_css = $this->get_list_chrome_css();
+		if ( '' !== $chrome_css ) {
+			\BoldSlider\Frontend\StyleInjector::queue_style( 'list-chrome', $chrome_css, self::HANDLE );
+		}
+
+		// Remove all notice hooks so nothing renders above our React root.
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+
 		$builder_base = admin_url( 'admin.php?page=' . BuilderPage::MENU_SLUG . '&id=' );
 
 		wp_add_inline_script(
@@ -61,29 +71,13 @@ final class ListPage {
 		);
 	}
 
-	public function clean_page_chrome(): void {
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( ! $screen || 'toplevel_page_' . self::MENU_SLUG !== $screen->id ) {
-			return;
-		}
-		// Remove all notice hooks so nothing renders above our React root.
-		remove_all_actions( 'admin_notices' );
-		remove_all_actions( 'all_admin_notices' );
-		remove_all_actions( 'user_admin_notices' );
-		?>
-		<style id="boldslider-list-chrome">
+	private function get_list_chrome_css(): string {
+		return '
 			/* Hide the default WP page heading and any leftover notice markup */
-			.toplevel_page_boldslider .wrap > h1,
-			.toplevel_page_boldslider .wp-header-end,
-			#wpbody-content > .notice,
-			#wpbody-content > .updated,
-			#wpbody-content > .update-nag,
-			#wpbody-content > .error { display: none !important; }
+			.toplevel_page_boldslider .wrap > h1, .toplevel_page_boldslider .wp-header-end, #wpbody-content > .notice, #wpbody-content > .updated, #wpbody-content > .update-nag, #wpbody-content > .error { display: none !important; }
 			/* Let our React root span the full content area */
-			.toplevel_page_boldslider #wpbody-content,
-			.toplevel_page_boldslider .wrap { padding: 0; margin: 0; }
-		</style>
-		<?php
+			.toplevel_page_boldslider #wpbody-content, .toplevel_page_boldslider .wrap { padding: 0; margin: 0; }
+		';
 	}
 
 	public function render(): void {

@@ -79,6 +79,32 @@ Two options:
 
 Yes. On the slider list page, hover any card and click **Export** to download a JSON file. On the destination site, click **Import** and pick the JSON file.
 
+== Development ==
+
+= Source code =
+
+The compiled/minified JavaScript and CSS files in `assets/dist/` are built from the uncompressed source code included in this plugin:
+
+* **Editor UI (React):** `editor/src/` — JSX components, store, hooks, views, and SCSS styles.
+* **Frontend runtime:** `editor/src/frontend.js` — Swiper initialization and layer animations.
+* **Block editor script:** `editor/src/block.js` — Gutenberg block registration.
+* **Stylesheets:** `editor/src/editor.scss` and `editor/src/frontend.scss`.
+
+= Build instructions =
+
+Prerequisites: Node.js 18+ and npm 9+.
+
+1. Navigate to the plugin directory: `cd boldslider`
+2. Install dependencies: `npm install`
+3. Build production assets: `npm run build`
+4. For development with live rebuild: `npm run start`
+
+The build pipeline uses `@wordpress/scripts` (webpack-based).
+
+= Third-party libraries =
+
+* [Swiper](https://swiperjs.com/) v11 — MIT License — touch-enabled slider engine.
+
 == Screenshots ==
 
 1. Visual layer editor with drag & resize handles.

@@ -288,7 +288,11 @@ final class Controller {
 
 		SliderRepository::save( $new_id, $data );
 
-		return new \WP_REST_Response( $this->format_list_item( get_post( $new_id ) ), 200 );
+		$post = get_post( $new_id );
+		if ( ! $post instanceof \WP_Post ) {
+			return new \WP_Error( 'boldslider_dup_failed', __( 'Failed to retrieve duplicated slider.', 'boldslider' ), array( 'status' => 500 ) );
+		}
+		return new \WP_REST_Response( $this->format_list_item( $post ), 200 );
 	}
 
 	public function import_item( \WP_REST_Request $request ) {
@@ -338,7 +342,11 @@ final class Controller {
 
 		SliderRepository::save( $new_id, $data );
 
-		return new \WP_REST_Response( $this->format_list_item( get_post( $new_id ) ), 200 );
+		$post = get_post( $new_id );
+		if ( ! $post instanceof \WP_Post ) {
+			return new \WP_Error( 'boldslider_import_failed', __( 'Failed to retrieve imported slider.', 'boldslider' ), array( 'status' => 500 ) );
+		}
+		return new \WP_REST_Response( $this->format_list_item( $post ), 200 );
 	}
 
 	public function delete_item( \WP_REST_Request $request ): \WP_REST_Response {

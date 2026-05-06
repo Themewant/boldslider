@@ -135,7 +135,7 @@ final class SliderBlock {
 		foreach ( $query->posts as $post ) {
 			$sliders[] = array(
 				'id'    => (int) $post->ID,
-				'title' => (string) $post->post_title,
+				'title' => (string) ( $post->post_title ?? '' ),
 			);
 		}
 		return array(

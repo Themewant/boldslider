@@ -124,7 +124,7 @@ final class SliderWidget extends Widget_Base {
 
 		foreach ( $query->posts as $post ) {
 			$status_label               = 'draft' === $post->post_status ? ' (Draft)' : '';
-			$options[ (int) $post->ID ] = ( $post->post_title ?: ( '#' . $post->ID ) ) . $status_label;
+			$options[ (int) $post->ID ] = ( ( $post->post_title ?? '' ) ?: ( '#' . $post->ID ) ) . $status_label;
 		}
 
 		return $options;

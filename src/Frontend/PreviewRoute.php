@@ -61,14 +61,14 @@ final class PreviewRoute {
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title><?php echo esc_html( sprintf( /* translators: %s: slider title */ __( 'Preview — %s', 'boldslider' ), $post->post_title ) ); ?></title>
+	<title><?php echo esc_html( sprintf( /* translators: %s: slider title */ __( 'Preview — %s', 'boldslider' ), $post->post_title ?? '' ) ); ?></title>
 	<?php wp_head(); ?>
 </head>
 <body>
 	<div class="bs-preview-bar">
 		<div class="bs-preview-bar__title">
 			<span class="dot"></span>
-			<?php echo esc_html( __( 'Preview:', 'boldslider' ) . ' ' . $post->post_title ); ?>
+			<?php echo esc_html( __( 'Preview:', 'boldslider' ) . ' ' . ( $post->post_title ?? '' ) ); ?>
 		</div>
 		<div class="bs-preview-bar__actions">
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=boldslider-builder&id=' . $id ) ); ?>"><?php esc_html_e( 'Back to Builder', 'boldslider' ); ?></a>

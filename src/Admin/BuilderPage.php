@@ -126,16 +126,17 @@ final class BuilderPage {
 			.wp-pointer,
 			#setting-error-settings_updated,
 			.settings-error { display: none !important; visibility: hidden !important; }
+			/* Hide loading shell notice text. */
+			.bs-loading-shell__text { display: none !important; }
 			/* Force the dark builder background from the very first paint. */
-			html { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
-			body { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; height: 100vh !important; }
+			html { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; }
+			body { padding: 0 !important; margin: 0 !important; background: #13161a !important; overflow: hidden !important; }
 			body.wp-admin { background: #13161a !important; }
-			#wpcontent, #wpbody, #wpbody-content { margin: 0 !important; padding: 0 !important; float: none; background: #13161a !important; height: 100vh !important; overflow: hidden !important; }
+			#wpcontent, #wpbody, #wpbody-content { margin: 0 !important; padding: 0 !important; float: none; background: #13161a !important; overflow: hidden !important; }
 			.wrap { margin: 0 !important; padding: 0 !important; }
 			#' . self::ROOT_ID . ' { position: fixed; inset: 0; z-index: 9999; overflow: hidden; background: #13161a; }
 			.bs-loading-shell { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #13161a; color: #b0b6bf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 			.bs-loading-shell__spinner { width: 36px; height: 36px; border: 3px solid #2d3136; border-top-color: #2271b1; border-radius: 50%; animation: bs-loading-spin 0.7s linear infinite; }
-			.bs-loading-shell__text { font-size: 13px; font-weight: 500; letter-spacing: .01em; }
 			@keyframes bs-loading-spin { to { transform: rotate( 360deg ); } }
 		';
 	}

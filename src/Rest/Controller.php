@@ -216,7 +216,8 @@ final class Controller {
 	public function get_item( \WP_REST_Request $request ): \WP_REST_Response {
 		$id    = (int) $request->get_param( 'id' );
 		$post  = get_post( $id );
-		$title = ( $post instanceof \WP_Post && $post->post_title ) ? (string) $post->post_title : '';
+		// Ensure title is always a non-null string to prevent WordPress strip_tags() deprecation warning.
+		$title = $post instanceof \WP_Post ? (string) ( $post->post_title ?? '' ) : '';
 		$data  = SliderRepository::get( $id );
 		$data  = $this->resolve_image_urls( $data );
 
@@ -418,7 +419,8 @@ final class Controller {
 
 		return array(
 			'id'            => $post->ID,
-			'title'         => $post->post_title ? (string) $post->post_title : '',
+			// Ensure title is always a non-null string to prevent WordPress strip_tags() deprecation warning.
+			'title'         => (string) ( $post->post_title ?? '' ),
 			'slide_count'   => $slide_count,
 			'thumbnail_url' => $thumbnail_url,
 			'shortcode'     => \BoldSlider\Admin\BuilderPage::build_shortcode( (int) $post->ID ),

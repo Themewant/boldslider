@@ -191,8 +191,9 @@ final class Controller {
 	}
 
 	public function create_item( \WP_REST_Request $request ) {
-		$body  = $request->get_json_params() ?: array();
-		$title = isset( $body['title'] ) ? sanitize_text_field( (string) $body['title'] ) : __( 'New Slider', 'boldslider' );
+		$body     = $request->get_json_params() ?: array();
+		$title    = isset( $body['title'] ) ? sanitize_text_field( (string) $body['title'] ) : __( 'New Slider', 'boldslider' );
+		$template = isset( $body['template'] ) ? sanitize_key( (string) $body['template'] ) : 'simple';
 
 		$post_id = wp_insert_post( array(
 			'post_type'   => PostType::SLUG,
@@ -204,7 +205,16 @@ final class Controller {
 			return new \WP_Error( 'boldslider_create_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 		}
 
-		SliderRepository::save( $post_id, Schema::defaults() );
+		/**
+		 * Filter the seed data used when creating a new slider from a template.
+		 * Add-on plugins can register additional templates by hooking this filter.
+		 *
+		 * @param array  $data     Default slider data (from Schema::defaults()).
+		 * @param string $template Template id requested by the client.
+		 */
+		$data = (array) apply_filters( 'boldslider_template_seed', Schema::defaults(), $template );
+
+		SliderRepository::save( $post_id, $data );
 
 		$fake_request = new \WP_REST_Request( 'GET' );
 		$fake_request->set_param( 'id', $post_id );

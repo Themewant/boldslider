@@ -28,7 +28,7 @@ BoldSlider is a lightweight, fully-responsive slider builder for WordPress with 
 * **Autoplay** with delay + pause-on-hover.
 * **Layer animations** — 8 CSS-based entrance presets (fade, fade-up/down/left/right, zoom-in/out).
 * **Button hover styles** + 12 built-in arrow icons.
-* **Free templates:** Simple slider (more templates in the BoldSlider Pro add-on).
+* **Starter templates:** Multiple ready-to-use templates (Hero, Business, Portfolio, Testimonials, Promo / Sale, Product Launch, Team, Event, Startup, Minimal, Restaurant, Charity, Welcome).
 * **Embed** via `[boldslider id="your-slider-slug"]` shortcode or Gutenberg block.
 * **Import / Export** sliders as JSON.
 * **Duplicate** sliders + slides in one click.
@@ -39,11 +39,7 @@ BoldSlider is a lightweight, fully-responsive slider builder for WordPress with 
 
 = External services =
 
-This free version of BoldSlider does not call out to any external services or CDNs. All assets are bundled locally inside the plugin.
-
-= Pro add-on (sold separately) =
-
-The Pro add-on plugin adds: Carousel/multi-slide layouts, advanced effects (Cube/Coverflow extensions, Panorama, Carousel, Shutters, Slicer, GL, Tinder, Material, Cards Stack, Expo, Super Flow, Creative), GSAP-powered animations, animation OUT, post slider, WooCommerce slider, Lottie & form layers, YouTube/Vimeo background videos, hash navigation, scrollbar, mouse wheel control, free mode, dynamic bullets, custom navigation icons, slide template library, and more.
+BoldSlider does not call out to any external services or CDNs. All assets are bundled locally inside the plugin.
 
 == Installation ==
 
@@ -62,11 +58,7 @@ No. BoldSlider is built with vanilla JavaScript and Swiper. jQuery is not enqueu
 
 = Does the plugin call any external services? =
 
-No. The free version does not call any third-party CDNs or APIs. All assets (Swiper, fonts, etc.) are served from your own site.
-
-= Why are some features locked with a "PRO" badge? =
-
-Those features ship with the BoldSlider Pro add-on plugin. The free version is fully usable on its own.
+No. BoldSlider does not call any third-party CDNs or APIs. All assets (Swiper, fonts, etc.) are served from your own site.
 
 = How do I embed a slider? =
 

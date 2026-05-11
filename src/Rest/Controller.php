@@ -50,7 +50,7 @@ final class Controller {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'duplicate_item' ),
-				'permission_callback' => array( $this, 'can_edit_item' ),
+				'permission_callback' => array( $this, 'can_duplicate_item' ),
 				'args'                => array( 'id' => array( 'type' => 'integer', 'required' => true ) ),
 			)
 		);
@@ -64,14 +64,15 @@ final class Controller {
 			)
 		);
 
-		// Library: templates + slides.
+		// Library: templates + slides. Bundled content used by the builder UI;
+		// any user with edit_posts (i.e. who can author a slider) may read them.
 		register_rest_route(
 			self::NAMESPACE_V1,
 			'/library/templates',
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'library_templates' ),
-				'permission_callback' => array( $this, 'can_list' ),
+				'permission_callback' => array( $this, 'can_read_library' ),
 			)
 		);
 		register_rest_route(
@@ -80,7 +81,7 @@ final class Controller {
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'library_slides' ),
-				'permission_callback' => array( $this, 'can_list' ),
+				'permission_callback' => array( $this, 'can_read_library' ),
 			)
 		);
 
@@ -122,6 +123,21 @@ final class Controller {
 	public function can_create(): bool {
 		// Creating a new slider post requires publish_posts capability.
 		return current_user_can( 'publish_posts' );
+	}
+
+	public function can_read_library(): bool {
+		// Library endpoints expose bundled, non-user data used by the builder UI.
+		// Any user who can edit posts (i.e. can author a slider) may read them.
+		return current_user_can( 'edit_posts' );
+	}
+
+	public function can_duplicate_item( \WP_REST_Request $request ) {
+		// Duplicate creates a new slider post, so it needs the create capability
+		// AND the user must be able to read/edit the source slider.
+		if ( ! current_user_can( 'publish_posts' ) ) {
+			return new \WP_Error( 'boldslider_forbidden', __( 'You cannot create sliders.', 'boldslider' ), array( 'status' => 403 ) );
+		}
+		return $this->can_edit_item( $request );
 	}
 
 	public function can_edit_item( \WP_REST_Request $request ) {
@@ -175,9 +191,8 @@ final class Controller {
 	}
 
 	public function create_item( \WP_REST_Request $request ) {
-		$body     = $request->get_json_params() ?: array();
-		$title    = isset( $body['title'] ) ? sanitize_text_field( (string) $body['title'] ) : __( 'New Slider', 'boldslider' );
-		$template = isset( $body['template'] ) ? sanitize_key( (string) $body['template'] ) : 'simple';
+		$body  = $request->get_json_params() ?: array();
+		$title = isset( $body['title'] ) ? sanitize_text_field( (string) $body['title'] ) : __( 'New Slider', 'boldslider' );
 
 		$post_id = wp_insert_post( array(
 			'post_type'   => PostType::SLUG,
@@ -189,26 +204,11 @@ final class Controller {
 			return new \WP_Error( 'boldslider_create_failed', $post_id->get_error_message(), array( 'status' => 500 ) );
 		}
 
-		SliderRepository::save( $post_id, $this->build_template_data( $template ) );
+		SliderRepository::save( $post_id, Schema::defaults() );
 
 		$fake_request = new \WP_REST_Request( 'GET' );
 		$fake_request->set_param( 'id', $post_id );
 		return $this->get_item( $fake_request );
-	}
-
-	/**
-	 * Build the seed data for a new slider based on the chosen starter template.
-	 * Free template: 'simple'. Pro templates ('post', 'woocommerce') fall through
-	 * to the simple seed here — the Pro plugin (when present) extends this list
-	 * via a filter to provide its own seed.
-	 */
-	private function build_template_data( string $template ): array {
-		$data = Schema::defaults();
-		// Pro plugins can hook in: apply_filters('boldslider/template_seed', $data, $template).
-		if ( function_exists( 'apply_filters' ) ) {
-			$data = (array) apply_filters( 'boldslider/template_seed', $data, $template );
-		}
-		return $data;
 	}
 
 	// ---- Single item --------------------------------------------------------

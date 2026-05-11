@@ -61,12 +61,6 @@ final class BuilderPage {
 
 		ListPage::enqueue_bundle();
 		wp_enqueue_media();
-		// NOTE: Google Fonts are intentionally NOT loaded from the Google CDN here.
-		// WordPress.org plugin guidelines disallow third-party CDN requests.
-		// The Pro add-on can self-host or use the WPTT WebFont Loader to enable
-		// Google Fonts compliantly. The font picker in the builder still lists
-		// Google font names — they fall back to the user's theme stack in the free
-		// version unless the theme already loads them.
 
 		// Enqueue fullscreen builder CSS.
 		$fullscreen_css = $this->get_fullscreen_css();
